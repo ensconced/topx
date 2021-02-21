@@ -22,7 +22,7 @@
     "types"
   ],
   "scripts": {
-    "test": "yarn jest",
+    "test": "yarn tsc && yarn jest",
     "build": "yarn rollup -c rollup.config.js"
   }
 }
