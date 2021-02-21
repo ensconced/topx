@@ -5,6 +5,9 @@ function transpose(directedGraph) {
       result.set(source, []);
     }
     targets.forEach((target) => {
+      if (!result.has(target)) {
+        result.set(target, []);
+      }
       const arr = result.get(target);
       arr.push(source);
     });
@@ -12,4 +15,4 @@ function transpose(directedGraph) {
   return result;
 }
 
-module.exports = transpose;
+export default transpose;

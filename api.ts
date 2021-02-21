@@ -1,7 +1,7 @@
-const computeTopologicalOrdering = require("./topological-ordering");
-const transpose = require("./transpose");
+import computeTopologicalOrdering from "./topological-ordering";
+import transpose from "./transpose";
 
-function pipeline() {
+export function pipeline() {
   let dependencyMatrix;
   let topologicalOrdering;
   let graph;
@@ -22,8 +22,8 @@ function pipeline() {
     return topologicalOrdering.filter((node) => allReachableNodes.has(node));
   }
 
-  function node(updater) {
-    const resultNode = {};
+  function node(name: string, updater?) {
+    const resultNode = { name };
     function commit(newState) {
       this.state = newState;
       orderedDependents(this).forEach((dep) => dep.update());
@@ -47,5 +47,3 @@ function pipeline() {
     },
   };
 }
-
-module.exports = { pipeline };

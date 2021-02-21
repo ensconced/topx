@@ -34,7 +34,9 @@ function topologicalOrdering(graph) {
         const cycleIds = ancestorIds
           .slice(ancestorIds.indexOf(childNode))
           .concat([node, childNode])
-          .map((node) => node.name);
+          .map((node) => node.name)
+          // reverse because we want to report in terms of the original graph, rather than the transposed graph
+          .reverse();
         throw new Error(
           `Dependency cycle detected in the data pipeline: ${cycleIds.join(
             " -> "
@@ -65,4 +67,4 @@ function topologicalOrdering(graph) {
     .map(([node]) => node);
 }
 
-module.exports = topologicalOrdering;
+export default topologicalOrdering;
