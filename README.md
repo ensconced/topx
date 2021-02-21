@@ -17,8 +17,6 @@ With topx, you declare this dependency graph up-front.
 This means that after the state of one node changes, topx can automatically propagate
 that change throughout the dependency-graph as necessary.
 
-topx avoids problems
-
 An attempt to create a dependency cycle will be detected, and will throw an error.
 
 A simple example:
