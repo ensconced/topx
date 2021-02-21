@@ -1,10 +1,10 @@
-import * as topx from "./api";
-import { Pipeline } from "./api.d";
+import makePipeline from "../src/api";
+import { Pipeline } from "../src/types";
 
 describe("pipeline", () => {
   let pipeline: Pipeline;
   beforeEach(() => {
-    pipeline = topx.pipeline();
+    pipeline = makePipeline();
   });
   it("propagates updates along a simple chain", () => {
     const a = pipeline.node("a");

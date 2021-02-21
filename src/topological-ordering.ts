@@ -1,33 +1,55 @@
+import { PipelineGraph, PipelineNode } from "./types";
+
 /*
   "undiscovered", "discovered", and "finished" correspond to "white", "gray" and
   "black" respectively in the terminology sometimes used (e.g. in CLRS) to
   describe depth-first search,
 */
 
-function topologicalOrdering(graph) {
-  function discover(node) {
+enum NodePhase {
+  undiscovered,
+  discovered,
+  finished,
+}
+
+interface TopoNode {
+  phase: NodePhase;
+  discoveryTime: number;
+  finishTime: number;
+}
+
+function topologicalOrdering(graph: PipelineGraph): PipelineNode<unknown>[] {
+  function discover(node: PipelineNode<unknown>) {
     const nodeInfo = nodes.get(node);
+    if (!nodeInfo) throw new Error("could not find node info");
     nodes.set(node, {
       ...nodeInfo,
       discoveryTime: tick++,
-      phase: "discovered",
+      phase: NodePhase.discovered,
     });
   }
-  function finish(node) {
+  function finish(node: PipelineNode<unknown>) {
+    const nodeInfo = nodes.get(node);
+    if (!nodeInfo) throw new Error("could not find node");
     nodes.set(node, {
-      ...nodes.get(node),
+      ...nodeInfo,
       finishTime: tick++,
-      phase: "finished",
+      phase: NodePhase.finished,
     });
   }
-  function depthFirstSearch(node, ancestorIds) {
+  function depthFirstSearch(
+    node: PipelineNode<unknown>,
+    ancestorIds: PipelineNode<unknown>[]
+  ) {
     discover(node);
     const children = graph.get(node);
+    if (!children) throw new Error("could not find children of node");
     children.forEach((childNode) => {
       const childNodeInfo = nodes.get(childNode);
-      if (childNodeInfo.phase === "undiscovered") {
+      if (!childNodeInfo) throw new Error("could not find node");
+      if (childNodeInfo.phase === NodePhase.undiscovered) {
         depthFirstSearch(childNode, ancestorIds.concat(node));
-      } else if (childNodeInfo.phase === "discovered") {
+      } else if (childNodeInfo.phase === NodePhase.discovered) {
         // We have found a cycle in our dependency graph. This is not allowed
         // because it means we can't find a topological ordering, and could
         // cause infinite loops.
@@ -47,11 +69,11 @@ function topologicalOrdering(graph) {
     finish(node);
   }
   let tick = 0;
-  const nodes = new Map();
+  const nodes = new Map<PipelineNode<unknown>, TopoNode>();
   // need to convert from looking at dependencies of each node, to looking at upstream state for each node
   graph.forEach((_, node) => {
     nodes.set(node, {
-      phase: "undiscovered",
+      phase: NodePhase.undiscovered,
       discoveryTime: 0,
       finishTime: 0,
     });

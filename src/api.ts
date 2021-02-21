@@ -1,16 +1,16 @@
 import computeTopologicalOrdering from "./topological-ordering";
 import transpose from "./transpose";
-import { Pipeline, PipelineGraph, PipelineNode } from "./api.d";
+import { Pipeline, PipelineGraph, PipelineNode } from "./types";
 
-export function pipeline(): Pipeline {
+export default function makePipeline(): Pipeline {
   let dependencyMatrix: PipelineGraph;
   let topologicalOrdering: PipelineNode<unknown>[];
   let graph: PipelineGraph;
 
-  function orderedDependents<SourceState>(source: PipelineNode<SourceState>) {
+  function orderedDependents(source: PipelineNode<any>) {
     const allReachableNodes = new Set();
     // TODO - is it worth re-using the dfs function here?
-    function addChildren<ParentState>(parent: PipelineNode<ParentState>) {
+    function addChildren(parent: PipelineNode<any>) {
       const children = graph.get(parent);
       if (!children) throw new Error("node missing from graph");
       children.forEach((child) => {
@@ -24,22 +24,22 @@ export function pipeline(): Pipeline {
     return topologicalOrdering.filter((node) => allReachableNodes.has(node));
   }
 
-  function node<State>(
+  function node<State, UpstreamState extends unknown[]>(
     name: string,
-    updater?: (...upstreamState: unknown[]) => State
+    updater?: (...upstreamState: UpstreamState) => void
   ) {
-    const resultNode = ({
-      name,
-    } as unknown) as PipelineNode<State>; // TODO - lose this gross assertion...
+    const resultNode = { name } as PipelineNode<State>;
     function commit(this: PipelineNode<State>, newState: State) {
       this.state = newState;
       orderedDependents(this).forEach((dep) => dep.update());
     }
-    function update(this: PipelineNode<State>) {
+    function update(this: PipelineNode<any>) {
       if (updater) {
         const upstreamNodes = dependencyMatrix.get(this);
         if (!upstreamNodes) throw new Error("could not find upstream nodes");
-        this.state = updater(...upstreamNodes.map((dep) => dep.state));
+        this.state = updater(
+          ...(upstreamNodes.map((dep) => dep.state) as UpstreamState)
+        );
       }
     }
     resultNode.commit = commit.bind(resultNode);

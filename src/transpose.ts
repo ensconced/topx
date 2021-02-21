@@ -1,4 +1,6 @@
-function transpose(directedGraph) {
+import { PipelineGraph } from "./types";
+
+function transpose(directedGraph: PipelineGraph): PipelineGraph {
   const result = new Map();
   directedGraph.forEach((targets, source) => {
     if (!result.has(source)) {
