@@ -140,7 +140,7 @@ function transpose(directedGraph) {
     return result;
 }
 
-function pipeline() {
+function makePipeline() {
     var dependencyMatrix;
     var topologicalOrdering$1;
     var graph;
@@ -189,4 +189,4 @@ function pipeline() {
     };
 }
 
-export { pipeline };
+export default makePipeline;
