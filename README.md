@@ -54,7 +54,7 @@ pipeline.setDependencies(dependencies);
 // now update the state of "a"
 a.commit(10);
 // (Console output) "node c recieved state: 11"
-console.log(b.state); //
+console.log(b.state); // 11
 ```
 
 <!-- Believe it or not, the name topx was not inspired by mobx (I wasn't really aware
