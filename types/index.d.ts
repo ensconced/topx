@@ -6,7 +6,7 @@ export type PipelineNode<State> = {
   commit: (newState: State) => void;
   update: () => void;
 };
-export type PipelineGraph = Map<PipelineNode<unknown>, PipelineNode<unknown>[]>;
+export type PipelineGraph = Map<PipelineNode<any>, PipelineNode<any>[]>;
 export interface Pipeline {
   node<State, UpstreamState extends unknown[]>(
     name: string,
